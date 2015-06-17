@@ -1,4 +1,4 @@
-import Data.Char
+import           Data.Char
 
 -- 1
 even' :: Int -> Bool
@@ -30,30 +30,31 @@ perimeter (a) = sum a
 
 -- 8
 area :: [Float] -> Float
-area (a) = sqrt(p * areaCore p a)
-    where p = (perimeter a) / 2
-          areaCore p [a] = p - a
-          areaCore p (a:as) = (p - a) * areaCore p as
+area (a) = sqrt(halfPerimeter * areaCore halfPerimeter a)
+    where
+    halfPerimeter :: Float
+    halfPerimeter = perimeter a / 2
+    areaCore :: Float -> [Float] -> Float
+    areaCore p [a] = p - a
+    areaCore p (a:as) = (p - a) * areaCore p as
 
 -- 9
 calculate :: Char -> Float -> Float -> Float
-calculate op a b =
-    if op == '+' then
-        a + b
-    else if op == '-' then
-        a - b
-    else if op == '*' then
-        a * b
-    else
-        error "undefined"
+calculate op a b
+    | op == '+' = a + b
+    | op == '-' = a - b
+    | op == '*' = a * b
+    | otherwise = error "undefined"
 
 -- 10
-convert :: [Char] -> [Char] -> Float -> Float
-convert from to amount = amount * (convertCore from) / (convertCore to)
-    where convertCore "bgn" = 1
-          convertCore "eur" = 1.959
-          convertCore "usd" = 1.76
-          convertCore _ = error "unknown currency"
+convert :: String -> String -> Float -> Float
+convert from to amount = amount * convertCore from / convertCore to
+    where
+    convertCore :: String -> Float
+    convertCore "bgn" = 1
+    convertCore "eur" = 1.959
+    convertCore "usd" = 1.76
+    convertCore _ = error "unknown currency"
 
 -- 13
 head' :: [Float] -> Float
@@ -112,23 +113,23 @@ multiply (x:xs) (y:ys) = x * y : multiply xs ys
 multiply _ _ = []
 
 -- 25
-number2string :: Int -> [Char]
+number2string :: Int -> String
 number2string x = show x
 
 -- 26
-string2number :: [Char] -> Int
+string2number :: String -> Int
 string2number (x) = read x
 
 -- 27
-isValidId :: [Char] -> Bool
+isValidId :: String -> Bool
 isValidId (id) = mod (mod (weightedSum 0 (convertToIntArr id)) 11) 10 == digitToInt (last id)
                  where
-                 convertToIntArr :: [Char] -> [Int]
+                 convertToIntArr :: String -> [Int]
                  convertToIntArr (c:cs) = digitToInt c : convertToIntArr cs
                  convertToIntArr _ = []
 
                  weightedSum :: Int -> [Int] -> Int
-                 weightedSum index (d:ds) = d * (weight index) + weightedSum (index + 1) ds
+                 weightedSum index (d:ds) = d * weight index + weightedSum (index + 1) ds
                  weightedSum _ _ = 0
 
                  weight :: Int -> Int
@@ -144,12 +145,12 @@ isValidId (id) = mod (mod (weightedSum 0 (convertToIntArr id)) 11) 10 == digitTo
                  weight _ = 0
 
 -- 28
-whatZodiacSignIs :: [Char] -> [Char]
+whatZodiacSignIs :: String -> String
 whatZodiacSignIs (_:_:m0:m1:d0:d1:_) = checkSignCore (convertToDate m0 m1) (convertToDate d0 d1)
        where
        convertToDate :: Char -> Char -> Int
        convertToDate d0 d1 = string2number (d0 : [d1])
-       checkSignCore :: Int -> Int -> [Char]
+       checkSignCore :: Int -> Int -> String
        checkSignCore month day | (month == 1 && day >= 21) || (month == 2 && day < 19) = "Aquarius"
                                | (month == 2 && day >= 19) || (month == 3 && day < 21) = "Pisces"
                                | (month == 3 && day >= 21) || (month == 4 && day < 21) = "Aries"
