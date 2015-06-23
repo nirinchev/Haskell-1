@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fwarn-incomplete-patterns #-}
+
 import           Data.Char
 
 -- 1
@@ -37,6 +39,7 @@ area (a) = sqrt(halfPerimeter * areaCore halfPerimeter a)
     areaCore :: Float -> [Float] -> Float
     areaCore p [a] = p - a
     areaCore p (a:as) = (p - a) * areaCore p as
+    areaCore _ [] = 1
 
 -- 9
 calculate :: Char -> Float -> Float -> Float
@@ -59,10 +62,12 @@ convert from to amount = amount * convertCore from / convertCore to
 -- 13
 head' :: [Float] -> Float
 head' (x:_) = x
+head' _ = error "empty list"
 
 -- 14
 tail' :: [Float] -> [Float]
 tail' (_:xs) = xs
+tail' _ = error "empty list"
 
 -- 16
 last' :: [Float] -> Float
@@ -164,3 +169,108 @@ whatZodiacSignIs (_:_:m0:m1:d0:d1:_) = checkSignCore (convertToDate m0 m1) (conv
                                | (month == 11 && day >= 23) || (month == 12 && day < 22) = "Sagittarius"
                                | (month == 12 && day >= 22) || (month == 1 && day < 21) = "Capricorn"
                                | otherwise = error "Invalid month or day"
+whatZodiacSignIs _ = error "invalid id"
+
+-- 30
+concatenate :: [a] -> [a] -> [a]
+concatenate (x) (y) = x ++ y
+
+-- 31
+init' :: [a] -> [a]
+init' [x] = []
+init' (x:xs) = x : init'(xs)
+init' _ = error "You can't do that with the empty list!"
+
+-- 32
+take' :: Int -> [a] -> [a]
+take' number (x:xs) | number > 0 = x : take' (number - 1) xs
+                    | otherwise = []
+take' _ _ = []
+
+-- 33
+drop' :: Int -> [a] -> [a]
+drop' number (x:xs) | number > 0 = drop' (number - 1) xs
+                    | otherwise = x:xs
+drop' _ _ = []
+
+-- 34
+zip' :: [a] -> [b] -> [(a,b)]
+zip' (a:as) (b:bs) = (a,b) : zip' as bs
+zip' _ _ = []
+
+-- 35
+unzip' :: [(a,b)] -> ([a], [b])
+unzip' ((a,b):ts) = (a: (fst unzipped), b: (snd unzipped))
+                  where unzipped = unzip' ts
+unzip' _ = ([], [])
+
+-- 36
+group' :: (Eq a) => [a] -> [[a]]
+group' (a:as) = (a : takeWhile (== a) as) : group' (dropWhile (== a) as)
+group' [] = []
+
+-- 37
+pyths :: Int -> Int -> [(Int, Int, Int)]
+pyths start stop = [(a,b,c)|a <- [start..stop], b <- [a..stop], c <- [b..stop], a^2 + b^2 == c^2]
+
+-- 38
+multiplyBy :: Num a => a -> (a -> a)
+multiplyBy factor = \x -> x * factor
+
+-- 39
+lastDigits :: [Int] -> [Int]
+lastDigits (xs) = applyToAll (`mod` 10) xs
+
+-- 40
+stringsToInteger :: [String] -> [Int]
+stringsToInteger (xs) = applyToAll string2number xs
+
+-- 41
+fibonaccis :: [Int] -> [Int]
+fibonaccis (xs) = applyToAll fib xs
+                  where
+                  fib :: Int -> Int
+                  fib 0 = 0
+                  fib 1 = 1
+                  fib n = fib (n-1) + fib (n-2)
+
+-- 42
+applyToAll :: (a -> b) -> [a] -> [b]
+applyToAll func (x:xs) = func x : applyToAll func xs
+applyToAll _ _ = []
+
+-- 44
+odds :: [Int] -> [Int]
+odds (xs) = divisibles 2 xs
+
+-- 45
+divisibles :: Int -> ([Int] -> [Int])
+divisibles divisor = filterBy (\x -> mod x divisor == 0)
+
+-- 46
+filterBy :: (a -> Bool) -> ([a] -> [a])
+filterBy func = \xs -> [a|a <- xs, func a]
+
+-- 48
+product'' :: Num a => [a] -> a
+product'' [x] = x
+product'' (x:xs) = x * product'' xs
+product'' [] = 0
+
+-- 49
+concat' :: [[a]] -> [a]
+concat' [arr]      = arr
+concat' (arr:arrs) = arr ++ concat' arrs
+concat' _          = []
+
+-- 50
+reduce :: (res -> a -> res) -> res -> [a] -> res
+reduce func acc (x:xs) = reduce func (func acc x) xs
+reduce func acc _ = acc
+
+sum'' :: Num a => [a] -> a
+sum'' = reduce (+) 0
+
+-- 51
+-- reduce = foldl
+-- reduce' = foldr
