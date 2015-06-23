@@ -1,5 +1,7 @@
 {-# OPTIONS_GHC -fwarn-incomplete-patterns #-}
 
+import           Data.List
+
 -- 1
 map' :: (a -> b) -> [a] -> [b]
 map' _ [] = []
@@ -8,7 +10,7 @@ map' f xs = foldl (\ys y -> ys ++ [f y]) [] xs
 -- 2
 filter' :: (a -> Bool) -> [a] -> [a]
 filter' _ [] = []
-filter' f xs = foldl (\ys y -> ys ++ (if f y then [y] else [])) [] xs
+filter' f xs = foldl (\ys y -> ys ++ [y | f y]) [] xs
 
 -- 3
 quicksort :: Ord a => [a] -> [a]
@@ -17,12 +19,12 @@ quicksort (x:xs) = quicksort [a | a <- xs, a <= x] ++ [x] ++ quicksort [a | a <-
 
 -- 4
 repeat' :: a -> [a]
-repeat' x = map (\_ -> x) [1..]
+repeat' x = map (const x) [1..]
 
 -- 5
 cycle' :: [a] -> [a]
 cycle' [] = []
-cycle' (xs) = foldr (\_ ys -> xs ++ ys) [] [1..]
+cycle' xs = foldr (\_ ys -> xs ++ ys) [] [1..]
 
 -- 6
 every :: Int -> [a] -> [a]
@@ -42,12 +44,12 @@ localMaxima _          = []
 -- 8
 mapMap :: (a -> b) -> [[a]] -> [[b]]
 mapMap func [] = []
-mapMap func (x:xs) = map func x : (mapMap func xs)
+mapMap func xs = map (map func) xs
 
 -- 9
 filterFilter :: (a -> Bool) -> [[a]] -> [[a]]
 filterFilter func [] = []
-filterFilter func (x:xs) = filter func x : filterFilter func xs
+filterFilter func xs = map (filter func) xs
 
 -- 10
 unit :: Int -> Int -> [[Int]]
@@ -65,9 +67,9 @@ row n (x:xs) | n < 0 = error "Invalid index"
              | otherwise = row (n-1) xs
 
 -- 12
-transpose :: [[a]] -> [[a]]
-transpose ([]:_) = []
-transpose a = (map head a) : transpose (map tail a)
+transpose' :: [[a]] -> [[a]]
+transpose' ([]:_) = []
+transpose' a = map head a : transpose (map tail a)
 
 -- 13
 sumMatrices :: [[Int]] -> [[Int]] -> [[Int]]
@@ -82,3 +84,7 @@ multMatrices xs ys = multMatricesCore xs (transpose ys)
                    multMatricesCore [] _ = []
                    calc :: [Int] -> [Int] -> Int
                    calc x y = sum (zipWith (*) x y)
+
+-- 15
+histogram :: Ord a => [a] -> [(a, Int)]
+histogram x = map (\x -> (head x, length x)) (group (quicksort x))
